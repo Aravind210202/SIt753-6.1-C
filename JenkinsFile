@@ -1,0 +1,76 @@
+pipeline {
+    agent any
+
+    environment {
+        DIRECTORY_PATH = '/Applications/SIT753/JenkinsFile' 
+        TESTING_ENVIRONMENT = 'Sit753 6.1C'
+        PRODUCTION_ENVIRONMENT = 'Aravind-test-env'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    echo "Fetch the source code from the directory path specified by the environment variable: ${env.DIRECTORY_PATH}"
+                    echo "Compile the code and generate any necessary artifacts using Maven"
+                    
+                }
+            }
+        }
+        stage('Unit and Integration Tests') {
+            steps {
+                script {
+                    echo "Run unit tests and integration tests using tools like JUnit and Selenium"
+                }
+            }
+        }
+        stage('Code Analysis') {
+            steps {
+                script {
+                    echo "Analyze the code quality using tools like SonarQube"
+                }
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                script {
+                    echo "Perform security scan using tools like OWASP ZAP or Snyk"
+                }
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                script {
+                    echo "Deploy the application to a staging server specified by the environment variable: ${env.TESTING_ENVIRONMENT}"
+                }
+            }
+        }
+        stage('Integration Tests on Staging') {
+            steps {
+                script {
+                    echo "Run integration tests on the staging environment"
+                }
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    echo "Deploy the application to the production server specified by the environment variable: ${env.PRODUCTION_ENVIRONMENT}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            emailext (
+                subject: "Build ${currentBuild.fullDisplayName}",
+                body: """<p>Build ${currentBuild.fullDisplayName} is completed.</p>
+                         <p>Status: ${currentBuild.result}</p>
+                         <p>Security Scan: ${currentBuild.result}</p>
+                         <p>Check console output at ${env.BUILD_URL} for details.</p>""",
+                to: 'gushanewindia@gmail.com'
+            )
+        }
+    }
+}
